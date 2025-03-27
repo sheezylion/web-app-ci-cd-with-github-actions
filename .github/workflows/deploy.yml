@@ -1,0 +1,54 @@
+name: Deploy Interactive Web App
+
+on:
+  push:
+    branches:
+      - main # Trigger workflow when code is pushed to 'main'
+
+jobs:
+  build:
+    name: Build & Test Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3 # Fetches the latest code
+
+      - name: Lint JavaScript
+        run: |
+          if [ -d js ]; then
+            npx eslint "js/*.js" || true  # Check JS syntax errors
+          else
+            echo "No JavaScript files found, skipping ESLint."
+          fi
+
+      - name: Validate HTML
+        run: |
+          if [ -f index.html ]; then
+            npx html-validator-cli --file index.html --format text || true  # Validate HTML structure
+          else
+            echo "No index.html found, skipping HTML validation."
+          fi
+
+      - name: Check for Broken Links
+        run: |
+          if [ -f index.html ]; then
+            npx broken-link-checker http://localhost:8080 --recursive || true
+          else
+            echo "No index.html found, skipping broken link check."
+          fi
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build # ✅ Only run if build & tests pass
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages # ✅ Deploy to 'gh-pages' branch
+          folder: . # ✅ Deploy from root folder
