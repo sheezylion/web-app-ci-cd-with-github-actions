@@ -1,5 +1,5 @@
 // DOM element selectors
-const configContainer = document.querySelector(".config-container");
+cons configContainer = document.querySelector(".config-container");
 const quizContainer = document.querySelector(".quiz-container");
 const answerOptions = quizContainer.querySelector(".answer-options");
 const nextQuestionBtn = quizContainer.querySelector(".next-question-btn");
